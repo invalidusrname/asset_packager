@@ -29,7 +29,10 @@ class AssetPackageHelperProductionTest < Test::Unit::TestCase
 
   cattr_accessor :packages_built
 
-  unless rails2?
+  if rails2?
+    include ActionController::Assertions::DomAssertions
+    include ActionController::TestCase::Assertions
+  else
     include ActionDispatch::Assertions::DomAssertions
 
     def config

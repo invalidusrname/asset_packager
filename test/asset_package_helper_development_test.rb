@@ -28,7 +28,10 @@ class AssetPackageHelperDevelopmentTest < Test::Unit::TestCase
   include ActionView::Helpers::AssetTagHelper
   include Synthesis::AssetPackageHelper
 
-  unless rails2?
+  if rails2?
+    include ActionController::Assertions::DomAssertions
+    include ActionController::TestCase::Assertions
+  else
     include ActionDispatch::Assertions::DomAssertions
 
     def config
