@@ -51,9 +51,13 @@ module Synthesis
         source_names = Array.new
         targets.each do |target|
           package = find_by_target(asset_type, target)
-          source_names += (package ? package.sources.collect do |src|
-            package.target_dir.gsub(/^(.+)$/, '\1/') + src
-          end : target.to_a)
+          if package
+            source_names += package.sources.collect do |src|
+              package.target_dir.gsub(/^(.+)$/, '\1/') + src
+            end
+          else
+            source_names += target.split(' ')
+          end
         end
         source_names.uniq
       end
