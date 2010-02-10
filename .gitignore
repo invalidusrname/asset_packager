@@ -1,0 +1,3 @@
+test/assets/javascripts/*packaged.js
+test/assets/stylesheets/*packaged.css
+test/assets/stylesheets/subdir/*

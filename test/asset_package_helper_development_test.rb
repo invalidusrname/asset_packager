@@ -6,10 +6,15 @@ require 'test/unit'
 require 'rubygems'
 require 'mocha'
 
-if Rails.version.to_f < 3.0
+def rails2?
+  (Rails.version.to_f < 3.0)
+end
+
+if rails2?
   require 'action_controller/test_process'
 else
   require 'action_dispatch/testing/test_process'
+  require 'action_dispatch/testing/assertions/dom'
 end
 
 ActionController::Base.logger = nil
@@ -23,18 +28,36 @@ class AssetPackageHelperDevelopmentTest < Test::Unit::TestCase
   include ActionView::Helpers::AssetTagHelper
   include Synthesis::AssetPackageHelper
 
+  unless rails2?
+    include ActionDispatch::Assertions::DomAssertions
+
+    def config
+      @config = ActiveSupport::OrderedOptions.new
+      @config['javascripts_dir'] = "public/javascripts"
+      @config['stylesheets_dir'] = "public/stylesheets"
+      @config['assets_dir'] = "public"
+      @config
+    end
+
+    def controller
+      Class.new do
+        def request
+          @request ||= ActionDispatch::TestRequest.new
+        end
+      end.new
+    end
+  end
+
   def setup
     Synthesis::AssetPackage.any_instance.stubs(:log)
 
-    @controller = Class.new do
-      def request
-        if Rails.version.to_f < 3.0
-          @request ||= ActionController::TestRequest.new
-        else
-          @request ||= ActionDispatch::TestRequest.new
+    if rails2?
+      @controller = Class.new do
+        def request
+            @request ||= ActionController::TestRequest.new
         end
-      end
-    end.new
+      end.new
+    end
   end
 
   def build_js_expected_string(*sources)
